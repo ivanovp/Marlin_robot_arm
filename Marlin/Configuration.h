@@ -60,7 +60,7 @@
 // @section info
 
 // Author info of this build printed to the host during boot and M115
-#define STRING_CONFIG_H_AUTHOR "(none, default config)" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "Peter Ivanov <ivanovp@gmail.com>" // Who made the changes.
 //#define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
 
 /**
@@ -87,7 +87,10 @@
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
+  //#define MOTHERBOARD BOARD_MKS_GEN_13
   #define MOTHERBOARD BOARD_RAMPS_14_EFB
+  //#define MOTHERBOARD BOARD_BTT_SKR_V1_4
+  //#define MOTHERBOARD BOARD_BTT_SKR_V1_4_TURBO
 #endif
 
 /**
@@ -156,7 +159,7 @@
  *          TMC5130, TMC5130_STANDALONE, TMC5160, TMC5160_STANDALONE
  * :['A4988', 'A5984', 'DRV8825', 'LV8729', 'TB6560', 'TB6600', 'TMC2100', 'TMC2130', 'TMC2130_STANDALONE', 'TMC2160', 'TMC2160_STANDALONE', 'TMC2208', 'TMC2208_STANDALONE', 'TMC2209', 'TMC2209_STANDALONE', 'TMC26X', 'TMC26X_STANDALONE', 'TMC2660', 'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE', 'TMC5160', 'TMC5160_STANDALONE']
  */
-#define X_DRIVER_TYPE  A4988
+#define X_DRIVER_TYPE  TB6600 // DM556
 #define Y_DRIVER_TYPE  A4988
 #define Z_DRIVER_TYPE  A4988
 //#define X2_DRIVER_TYPE A4988
@@ -530,7 +533,7 @@
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
  *
  */
-#define TEMP_SENSOR_0 1
+#define TEMP_SENSOR_0 998
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
@@ -1160,14 +1163,27 @@
  * Override with M92
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 500 }
+/* 
+ * X -> max. 360 degrees, 200 steps/revolution, 1/32 microstepping (6400 pulse/rev)
+ * Pulley ratio 80:20 = 4
+ * 200.0 / 360 * 32 * 80 / 20 = 71.11111
+ * 
+ * Y -> max. 360 degrees, 200 steps/revolution, 1/16 microstepping
+ * Pulley ratio 80:16 = 5
+ * 200.0 / 360 * 16 * 80 / 16 = 44.44444 steps/degree
+ *
+ * Z -> max. 360 degrees, 200 steps/revolution, 1/16 microstepping
+ * Pulley ratio 48:16 = 3
+ * 200.0 / 360 * 16 * 48 / 16 = 26.66666 steps/degree
+ */
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 71.11111, 44.44444, 26.66666, 500 }
 
 /**
  * Default Max Feed Rate (linear=mm/s, rotational=°/s)
  * Override with M203
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 300, 300, 5, 25 }
+#define DEFAULT_MAX_FEEDRATE          { 50, 75, 50, 25 }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -1180,7 +1196,7 @@
  * Override with M201
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 3000, 3000, 100, 10000 }
+#define DEFAULT_MAX_ACCELERATION      { 75, 100, 50, 10000 }
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
@@ -1195,9 +1211,9 @@
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   3000    // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_ACCELERATION          300    // X, Y, Z and E acceleration for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  300    // E acceleration for retracts
+#define DEFAULT_TRAVEL_ACCELERATION   300    // X, Y, Z acceleration for travel (non printing) moves
 
 /**
  * Default Jerk limits (mm/s)
@@ -1227,7 +1243,7 @@
   #endif
 #endif
 
-#define DEFAULT_EJERK    5.0  // May be used by Linear Advance
+#define DEFAULT_EJERK    0.1  // May be used by Linear Advance
 
 /**
  * Junction Deviation Factor
@@ -1614,9 +1630,9 @@
 #define DISABLE_X false
 #define DISABLE_Y false
 #define DISABLE_Z false
-//#define DISABLE_I false
-//#define DISABLE_J false
-//#define DISABLE_K false
+#define DISABLE_I false
+#define DISABLE_J false
+#define DISABLE_K false
 //#define DISABLE_U false
 //#define DISABLE_V false
 //#define DISABLE_W false
@@ -1696,12 +1712,12 @@
 #define X_MAX_POS X_BED_SIZE
 #define Y_MAX_POS Y_BED_SIZE
 #define Z_MAX_POS 200
-//#define I_MIN_POS 0
-//#define I_MAX_POS 50
-//#define J_MIN_POS 0
-//#define J_MAX_POS 50
-//#define K_MIN_POS 0
-//#define K_MAX_POS 50
+#define I_MIN_POS 0
+#define I_MAX_POS 180
+#define J_MIN_POS 0
+#define J_MAX_POS 180
+#define K_MIN_POS 0
+#define K_MAX_POS 180
 //#define U_MIN_POS 0
 //#define U_MAX_POS 50
 //#define V_MIN_POS 0
@@ -2448,7 +2464,7 @@
  * SD Card support is disabled by default. If your controller has an SD slot,
  * you must uncomment the following option or it won't work.
  */
-//#define SDSUPPORT
+#define SDSUPPORT
 
 /**
  * SD CARD: ENABLE CRC
@@ -2528,7 +2544,7 @@
 //
 // Add individual axis homing items (Home X, Home Y, and Home Z) to the LCD menu.
 //
-//#define INDIVIDUAL_AXIS_HOMING_MENU
+#define INDIVIDUAL_AXIS_HOMING_MENU
 //#define INDIVIDUAL_AXIS_HOMING_SUBMENU
 
 //
@@ -2561,7 +2577,7 @@
 //
 // Note: Usually sold with a white PCB.
 //
-//#define REPRAP_DISCOUNT_SMART_CONTROLLER
+#define REPRAP_DISCOUNT_SMART_CONTROLLER
 
 //
 // GT2560 (YHCB2004) LCD Display
@@ -3323,13 +3339,13 @@
 // (ms) Delay before the next move will start, to give the servo time to reach its target angle.
 // 300ms is a good value but you can try less delay.
 // If the servo can't reach the requested position, increase it.
-#define SERVO_DELAY { 300 }
+#define SERVO_DELAY { 300, 300, 300 }
 
 // Only power servos during movement, otherwise leave off to prevent jitter
 //#define DEACTIVATE_SERVOS_AFTER_MOVE
 
 // Edit servo angles with M281 and save to EEPROM with M500
-//#define EDITABLE_SERVO_ANGLES
+#define EDITABLE_SERVO_ANGLES
 
 // Disable servo with M282 to reduce power consumption, noise, and heat when not in use
 //#define SERVO_DETACH_GCODE
